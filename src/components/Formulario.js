@@ -5,37 +5,86 @@ import styled from '@emotion/styled';
 const Form = styled.form`
   margin: 2rem 0;
 `;
+const Hr = styled.hr`
+  margin: 2.5rem auto;
+  border-bottom: .1rem solid rgba(255, 255, 255, 0.3);
+`;
+const Button = styled.input`
+  background-color: #fdd835!important;
+  border: .1rem solid #fdd835!important;
 
-
-const Formulario = () => {
-
-  const [datos, guardarDatos] = useState({
-    ciudad: '',
-    pais: ''
-  });
-  const { ciudad, pais } = datos;
- 
-  function handleStateForm(e){
-    guardarDatos({
-      
-    })
+  &:hover{
+    background-color: #fddd4e!important;
+    border: .1rem solid #fddd4e!important;
   }
+  &:active{
+    background-color: #fdce02!important;
+    border: .1rem solid #fdce02!important;
+  }
+`;
+
+
+const Formulario = ( {busqueda, guardarBusqueda, guardarConsulta} ) => {
+
+
+  // Extraer los valores en variables
+  const { ciudad, pais } = busqueda;
+  const [error, guardarError] = useState(false);
+  /* ============================================================================= */
+
+
+  // Elemento error
+  const msnError = (eventError, message) => {
+    return eventError ? <p className="msn msn-l-cancel"><i className="a-info-warning"></i>&nbsp; {message}</p> : null ;
+  };
+  // Guardar la información en el STATE
+  const handleChangeForm = (e) => {
+    guardarBusqueda({
+      ...busqueda,
+      [e.target.name]: e.target.value
+    });
+  }
+
+  // SUBMIT del formulario
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Validar
+    if (ciudad.trim() === '' || pais.trim() === '') {
+      guardarError(true);
+      return
+    }
+
+    guardarError(false);
+    // Pasarlo al componente principal
+    guardarConsulta(true);
+  };
+
 
   return (
     <Fragment>
-      <Form className="form-group-line">
+      <Form
+        className="form-group-line"
+        onSubmit={handleSubmit}
+      >
+        {msnError(error, 'Todos los campos son obligatorios')}
+        {error ? <Hr/> : null}
         <div className="form-item-line">
           <input 
               type="text"
               id="ciudad"
               name="ciudad"
+              value={ciudad}
+              onChange={handleChangeForm}
             />
-          <label htmlFor="name">Ciudad</label>
+          <label htmlFor="ciudad">Ciudad</label>
         </div>
         <div className="form-item-line">
           <select 
               name="pais"
               id="pais"
+              value={pais}
+              onChange={handleChangeForm}
             >
             <option value="">--- Selecciona un país ---</option>
             <option value="US">Estados Unidos</option>
@@ -46,9 +95,15 @@ const Formulario = () => {
             <option value="ES">España</option>
             <option value="PE">Perú</option>
           </select>
-          <label htmlFor="options">País:</label>
+          <label htmlFor="pais">País:</label>
         </div>
-
+        <div className="form-submit-line">
+          <Button 
+            type="submit"
+            value="Consultar clima"
+            className="btn btn-warning"
+          />
+        </div>
       </Form>
     </Fragment>
   );
