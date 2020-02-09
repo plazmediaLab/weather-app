@@ -3,13 +3,24 @@ import styled from '@emotion/styled';
 import Header from './components/Header'
 import Formulario from './components/Formulario'
 import Clima from './components/Clima'
+import Footer from './components/Footer'
+import Error from './components/Error'
 
 
 const Col1 = styled.div`
-    padding-right: 1rem;
+  padding-right: 1rem;
+
+  @media (max-width: 589px) {
+    padding-right: 0;
+  }
 `;
 const Col2 = styled.div`
-    padding-left: 1rem;
+  padding-left: 1rem;
+
+  @media (max-width: 589px) {
+    padding-left: 0;
+    padding-bottom: 1rem;
+  }
 `;
 
 
@@ -29,6 +40,7 @@ function App() {
   });
   const [consulta,  guardarConsulta] = useState(false);
   const [resultado,  guardarResultado] = useState({});
+  const [error,  guardarError] = useState(false);
 
   const { ciudad, pais } = busqueda;
 
@@ -41,12 +53,20 @@ function App() {
       const resultado = await respuesta.json();
 
       guardarResultado(resultado)
+      if (resultado.cod === '404') {
+        guardarError(true)
+      }else{
+        guardarError(false)
+      }
     };
     if (consulta) {
       consultarAPI();
       guardarConsulta(false);
+      busqueda.ciudad= ''
+      
     }
-  }, [ciudad, pais, consulta])
+
+  }, [ciudad, pais, consulta, busqueda])
 
 
   return (
@@ -65,13 +85,17 @@ function App() {
               />
             </Col1>
             <Col2 className="col-6">
-              <Clima 
-                resultado={resultado}
-              />
+              {error ? 
+                <Error message='No se encontro resultados para la busqueda'/> 
+                :
+                <Clima 
+                  resultado={resultado}
+                />}
             </Col2>
           </div>
         </div>
       </div>
+      <Footer />
     </Fragment>
   );
 }

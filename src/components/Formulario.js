@@ -1,5 +1,6 @@
 import React, { useState, Fragment } from "react";
 import styled from '@emotion/styled';
+import PropTypes from 'prop-types';
 
 
 const Form = styled.form`
@@ -29,9 +30,10 @@ const Formulario = ( {busqueda, guardarBusqueda, guardarConsulta} ) => {
 
   // Extraer los valores en variables
   const { ciudad, pais } = busqueda;
-  const [error, guardarError] = useState(false);
+  const [error, guardarErrorLocal] = useState(false);
   /* ============================================================================= */
 
+  let ciudadInput = React.createRef();
 
   // Elemento error
   const msnError = (eventError, message) => {
@@ -51,14 +53,15 @@ const Formulario = ( {busqueda, guardarBusqueda, guardarConsulta} ) => {
     
     // Validar
     if (ciudad.trim() === '' || pais.trim() === '') {
-      guardarError(true);
+      guardarErrorLocal(true);
+      ciudadInput.current.focus();
       return
     }
-
-    guardarError(false);
+    guardarErrorLocal(false)
     // Pasarlo al componente principal
     guardarConsulta(true);
   };
+
 
 
   return (
@@ -72,6 +75,7 @@ const Formulario = ( {busqueda, guardarBusqueda, guardarConsulta} ) => {
         <div className="form-item-line">
           <input 
               type="text"
+              ref={ciudadInput}
               id="ciudad"
               name="ciudad"
               value={ciudad}
@@ -108,5 +112,13 @@ const Formulario = ( {busqueda, guardarBusqueda, guardarConsulta} ) => {
     </Fragment>
   );
 };
+
+
+Formulario.propTypes = {
+  busqueda: PropTypes.object.isRequired,
+  guardarBusqueda: PropTypes.func.isRequired,
+  guardarConsulta: PropTypes.func.isRequired,
+}
+
 
 export default Formulario
